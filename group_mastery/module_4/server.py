@@ -1,6 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 import time
+from random import randint
 
 sock = socket(AF_INET, SOCK_STREAM)
 sock.bind(('localhost', 8080))
@@ -74,8 +75,13 @@ while True:
         conn, addr = sock.accept()
         conn.setblocking(False)
         id_counter += 1
-        players[conn] = {'id': id_counter, 'x': 0, 'y': 0, 'r': 20}
+        start_x, start_y, start_r = randint(-200, 200), randint(-200, 200), 20
+        players[conn] = {'id': id_counter, 'x': start_x, 'y': start_y, 'r': start_r}
         conn_ids[conn] = id_counter
-        conn.send(f"{id_counter},0,0,20".encode())
-    except:
+        conn.send(f"{id_counter},{start_x},{start_y},{start_r}".encode())
+    except KeyboardInterrupt:
+        sock.close()
+        print("Server stopped.")
+        break
+    except BlockingIOError:
         pass
